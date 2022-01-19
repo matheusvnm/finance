@@ -2,6 +2,7 @@ package com.finance.domain;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 public class Receita {
@@ -77,5 +78,23 @@ public class Receita {
         }
         Receita other = (Receita) obj;
         return other.descricao.equalsIgnoreCase(this.descricao);
+    }
+
+    public LocalDate getDataInicialDoMes() {
+        String dia = "01";
+        String ano = String.valueOf(this.getData()
+                .getYear());
+        String mes = String.valueOf(this.getData()
+                .getMonth()
+                .getValue());
+        mes = Integer.parseInt(mes) < 10 ? "0" + mes : mes;
+        return LocalDate.parse(dia + "/" + mes
+                + "/" + ano, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    public LocalDate getDataFinalDoMes() {
+        return this.getDataInicialDoMes()
+                .plusMonths(1)
+                .minusDays(1);
     }
 }

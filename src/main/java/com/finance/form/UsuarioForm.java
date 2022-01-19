@@ -1,5 +1,6 @@
 package com.finance.form;
 
+import com.finance.config.security.JwtService;
 import com.finance.domain.Usuario;
 
 import javax.validation.constraints.*;
@@ -21,12 +22,16 @@ public class UsuarioForm {
     @Size(min = 6)
     private String senha;
 
-    public Usuario converter() {
+    public Usuario converter(JwtService jwtService) {
         Usuario usuario = new Usuario();
         usuario.setNome(this.nome);
         usuario.setEmail(this.email);
-        usuario.setSenha(this.senha);
+        usuario.setSenha(criptografarSenha(this.senha, jwtService));
         return usuario;
+    }
+
+    private String criptografarSenha(String senha, JwtService jwtService) {
+        return jwtService.criptografarSenha(senha);
     }
 
     public String getNome() {
