@@ -7,6 +7,7 @@ import com.finance.dto.UsuarioDto;
 import com.finance.exception.UserAlreadyExistsException;
 import com.finance.form.UsuarioForm;
 import com.finance.repository.UsuarioRepository;
+import com.finance.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,10 @@ public class RegistroController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
     @Autowired
     private JwtService jwtService;
 
@@ -34,10 +39,7 @@ public class RegistroController {
                                        UriComponentsBuilder uriComponentsBuilder) {
         Usuario usuario = usuarioForm.converter(jwtService);
         if (!usuarioRepository.existsByEmail(usuario.getEmail())) {
-            usuarioRepository.save(usuario);
-            URI uri = uriComponentsBuilder.path("/registrar/{id}")
-                    .buildAndExpand(usuario.getId())
-                    .toUri();
+            URI uri = usuarioService.saveAndBuildUri(usuario, uriComponentsBuilder, "registrar/{id}");
             return ResponseEntity.created(uri)
                     .body(new UsuarioDto(usuario));
         } else {

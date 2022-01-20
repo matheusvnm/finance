@@ -1,5 +1,10 @@
 package com.finance.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.finance.repository.ReceitaRepository;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +20,7 @@ public class Receita {
     private LocalDate data;
     @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnore
     private Usuario usuario;
 
     public Long getId() {
@@ -80,7 +86,7 @@ public class Receita {
         return other.descricao.equalsIgnoreCase(this.descricao);
     }
 
-    public LocalDate getDataInicialDoMes() {
+    private LocalDate getDataInicialDoMes() {
         String dia = "01";
         String ano = String.valueOf(this.getData()
                 .getYear());
@@ -92,9 +98,14 @@ public class Receita {
                 + "/" + ano, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
-    public LocalDate getDataFinalDoMes() {
+    private LocalDate getDataFinalDoMes() {
         return this.getDataInicialDoMes()
                 .plusMonths(1)
                 .minusDays(1);
+    }
+
+    public boolean existeReceitaComMesmaDescricaoNoMes(ReceitaRepository receitaRepository){
+        return receitaRepository.existsReceitaByDataBetweenAndDescricaoEquals(this.getDataInicialDoMes(),
+                this.getDataFinalDoMes(), this.descricao);
     }
 }

@@ -8,17 +8,18 @@ import javax.validation.constraints.*;
 public class UsuarioForm {
 
     @NotNull
-    @NotBlank
     @NotEmpty
+    @NotBlank(message = "O campo nome é obrigatório")
     @Size(min = 1, max = 40)
     private String nome;
 
     @Email
+    @NotBlank(message = "O campo e-mail é obrigatório")
     private String email;
 
     @NotNull
-    @NotBlank
     @NotEmpty
+    @NotBlank(message = "O campo senha é obrigatório")
     @Size(min = 6)
     private String senha;
 

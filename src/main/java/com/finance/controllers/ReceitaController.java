@@ -1,69 +1,95 @@
 package com.finance.controllers;
 
-import com.finance.config.security.JwtService;
 import com.finance.domain.Receita;
 import com.finance.domain.Usuario;
 import com.finance.dto.ReceitaDto;
 import com.finance.form.ReceitaForm;
-import com.finance.repository.ReceitaRepository;
-import com.finance.repository.UsuarioRepository;
+import com.finance.services.ReceitaService;
+import com.finance.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/receitas")
 public class ReceitaController {
 
     @Autowired
-    private ReceitaRepository receitaRepository;
+    private UsuarioService usuarioService;
+
     @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
-    private JwtService jwtService;
+    private ReceitaService receitaService;
+
+    @GetMapping
+    public Page<Receita> listarTodasReceitas(
+            @PageableDefault(sort = "descricao", direction = Sort.Direction.ASC) Pageable pageble,
+            HttpServletRequest request) {
+        Usuario usuario = usuarioService.recuperarUsuario(request);
+        Page<Receita> pageOfReceitas = receitaService.findReceitasDoUsuario(usuario, pageble);
+        return pageOfReceitas;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> detalharReceita(@PathVariable Long id, HttpServletRequest request) {
+        Usuario usuario = usuarioService.recuperarUsuario(request);
+        Optional<Receita> receitaOptional = receitaService.buscarReceitasDoUsuario(usuario, id);
+        return receitaOptional.isPresent() ? ResponseEntity.ok(receitaOptional.get()) : ResponseEntity.notFound()
+                .build();
+    }
 
     @Transactional
     @PostMapping
     public ResponseEntity<?> criarReceita(@RequestBody @Valid ReceitaForm receitaForm,
                                           UriComponentsBuilder uriComponentsBuilder,
                                           HttpServletRequest request) {
-        Usuario usuario = recuperarUsuario(request);
+        Usuario usuario = usuarioService.recuperarUsuario(request);
         Receita receita = receitaForm.converter(usuario);
-        if (descricaoDataReceitaValida(receita)) {
-            receitaRepository.save(receita);
-            URI uri = uriComponentsBuilder.path("/receita/{id}")
-                    .buildAndExpand(receita.getId())
-                    .toUri();
+        if (receitaService.isDescricaoAndDataValida(receita)) {
+            URI uri = receitaService.saveAndBuildUri(receita, uriComponentsBuilder, "/receita/{id}");
             return ResponseEntity.created(uri)
                     .body(new ReceitaDto(receita));
         }
+
         return ResponseEntity.badRequest()
                 .body("Já existe uma receita com está descrição no mês de " + receita.getData()
-                        .getMonth().getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
+                        .getMonth()
+                        .getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
     }
 
-    private Usuario recuperarUsuario(HttpServletRequest request) {
-        String token = jwtService.getToken(request);
-        Long idUsuario = jwtService.getIdUsuario(token);
-        return usuarioRepository.getById(idUsuario);
+    @Transactional
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizaReceita(@PathVariable Long id, @RequestBody @Valid ReceitaForm receitaForm,
+                                             HttpServletRequest request) {
+        Usuario usuario = usuarioService.recuperarUsuario(request);
+        Receita receita = receitaForm.converter(usuario);
+        if (receitaService.isDescricaoAndDataValida(receita)) {
+            Optional<Receita> receitaOptional = receitaService.buscarReceitasDoUsuario(usuario, id);
+            return receitaOptional.isPresent() ? ResponseEntity.ok(
+                    receitaForm.atualizarReceita(receitaOptional.get())) : ResponseEntity.notFound()
+                    .build();
+        }
+        return ResponseEntity.badRequest()
+                .body("Já existe uma receita com está descrição no mês de " + receita.getData()
+                        .getMonth()
+                        .getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
     }
 
-    private boolean descricaoDataReceitaValida(Receita receita) {
-        LocalDate startDate = receita.getDataInicialDoMes();
-        LocalDate endDate = receita.getDataFinalDoMes();
-        return !receitaRepository.existsReceitaByDataBetweenAndDescricaoEquals(startDate, endDate,
-                receita.getDescricao());
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<?> deleteReceita(@PathVariable Long id) {
+        return receitaService.deleteReceita(id);
     }
 }
