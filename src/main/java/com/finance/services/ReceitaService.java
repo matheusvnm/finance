@@ -23,11 +23,25 @@ public class ReceitaService {
         return !receita.existeReceitaComMesmaDescricaoNoMes(receitaRepository);
     }
 
-    public URI saveAndBuildUri(Receita receita, UriComponentsBuilder uriComponentsBuilder, String urlPath) {
+    public URI saveAndBuildUri(Receita receita, UriComponentsBuilder uriComponentsBuilder,
+                               String urlPath) {
         receitaRepository.save(receita);
         return uriComponentsBuilder.path(urlPath)
                 .buildAndExpand(receita.getId())
                 .toUri();
+    }
+
+
+    public Page<Receita> buscarTodasReceitasDoUsuario(Usuario usuario, Pageable pageable) {
+        return receitaRepository.findAllByUsuarioId(pageable, usuario.getId());
+    }
+
+    public Optional<Receita> buscarUmaReceitaDoUsuario(Usuario usuario, Long id) {
+        return usuario.getReceitas()
+                .stream()
+                .filter(receita -> receita.getId()
+                        .equals(id))
+                .findFirst();
     }
 
     public ResponseEntity<?> deleteReceita(Long id) {
@@ -39,17 +53,5 @@ public class ReceitaService {
         }
         return ResponseEntity.notFound()
                 .build();
-    }
-
-    public Page<Receita> findReceitasDoUsuario(Usuario usuario, Pageable pageable) {
-        return receitaRepository.findAllByUsuarioId(pageable, usuario.getId());
-    }
-
-    public Optional<Receita> buscarReceitasDoUsuario(Usuario usuario, Long id) {
-        return usuario.getReceitas()
-                .stream()
-                .filter(receita -> receita.getId()
-                        .equals(id))
-                .findFirst();
     }
 }

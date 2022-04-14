@@ -38,15 +38,15 @@ public class ReceitaController {
             @PageableDefault(sort = "descricao", direction = Sort.Direction.ASC) Pageable pageble,
             HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
-        Page<Receita> pageOfReceitas = receitaService.findReceitasDoUsuario(usuario, pageble);
-        return pageOfReceitas;
+        return receitaService.buscarTodasReceitasDoUsuario(usuario, pageble);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> detalharReceita(@PathVariable Long id, HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
-        Optional<Receita> receitaOptional = receitaService.buscarReceitasDoUsuario(usuario, id);
-        return receitaOptional.isPresent() ? ResponseEntity.ok(receitaOptional.get()) : ResponseEntity.notFound()
+        Optional<Receita> receitaOptional = receitaService.buscarUmaReceitaDoUsuario(usuario, id);
+        return receitaOptional.isPresent() ? ResponseEntity.ok(
+                receitaOptional.get()) : ResponseEntity.notFound()
                 .build();
     }
 
@@ -58,7 +58,8 @@ public class ReceitaController {
         Usuario usuario = usuarioService.recuperarUsuario(request);
         Receita receita = receitaForm.converter(usuario);
         if (receitaService.isDescricaoAndDataValida(receita)) {
-            URI uri = receitaService.saveAndBuildUri(receita, uriComponentsBuilder, "/receita/{id}");
+            URI uri = receitaService.saveAndBuildUri(receita, uriComponentsBuilder,
+                    "/receitas/{id}");
             return ResponseEntity.created(uri)
                     .body(new ReceitaDto(receita));
         }
@@ -71,12 +72,13 @@ public class ReceitaController {
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizaReceita(@PathVariable Long id, @RequestBody @Valid ReceitaForm receitaForm,
+    public ResponseEntity<?> atualizaReceita(@PathVariable Long id,
+                                             @RequestBody @Valid ReceitaForm receitaForm,
                                              HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
         Receita receita = receitaForm.converter(usuario);
         if (receitaService.isDescricaoAndDataValida(receita)) {
-            Optional<Receita> receitaOptional = receitaService.buscarReceitasDoUsuario(usuario, id);
+            Optional<Receita> receitaOptional = receitaService.buscarUmaReceitaDoUsuario(usuario, id);
             return receitaOptional.isPresent() ? ResponseEntity.ok(
                     receitaForm.atualizarReceita(receitaOptional.get())) : ResponseEntity.notFound()
                     .build();

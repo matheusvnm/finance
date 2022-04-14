@@ -1,7 +1,11 @@
 package com.finance.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.finance.repository.DespesaRepository;
+
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 public class Despesa {
@@ -11,10 +15,10 @@ public class Despesa {
     private Double valor;
     private String descricao;
     private LocalDate data;
-    private Boolean fixa;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
+    @JsonIgnore
     private Usuario usuario;
 
     public Long getId() {
@@ -49,14 +53,6 @@ public class Despesa {
         this.data = data;
     }
 
-    public Boolean getFixa() {
-        return fixa;
-    }
-
-    public void setFixa(Boolean fixa) {
-        this.fixa = fixa;
-    }
-
     public Usuario getUsuario() {
         return usuario;
     }
@@ -86,5 +82,29 @@ public class Despesa {
         }
         Despesa other = (Despesa) obj;
         return other.descricao.equalsIgnoreCase(this.descricao);
+    }
+
+    private LocalDate getDataInicialDoMes() {
+        String dia = "01";
+        String ano = String.valueOf(this.getData()
+                .getYear());
+        String mes = String.valueOf(this.getData()
+                .getMonth()
+                .getValue());
+        mes = Integer.parseInt(mes) < 10 ? "0" + mes : mes;
+        return LocalDate.parse(dia + "/" + mes
+                + "/" + ano, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    private LocalDate getDataFinalDoMes() {
+        return this.getDataInicialDoMes()
+                .plusMonths(1)
+                .minusDays(1);
+    }
+
+    public boolean existeDespesaComMesmaDescricaoNoMes(DespesaRepository despesaRepository) {
+        return despesaRepository.existsDespesaByDataBetweenAndDescricaoEquals(
+                this.getDataInicialDoMes(),
+                this.getDataFinalDoMes(), this.descricao);
     }
 }

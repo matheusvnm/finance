@@ -1,7 +1,7 @@
 package com.finance.controllers;
 
 import com.finance.config.security.JwtService;
-import com.finance.dto.TokenDTO;
+import com.finance.dto.TokenDto;
 import com.finance.form.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +26,12 @@ public class AuthenticationController {
     JwtService jwtService;
 
     @PostMapping
-    public ResponseEntity<TokenDTO> authenticate(@RequestBody @Valid LoginForm loginForm) {
+    public ResponseEntity<TokenDto> authenticate(@RequestBody @Valid LoginForm loginForm) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = loginForm.converter();
         try {
             Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
             String token = jwtService.gerarToken(authentication);
-            return ResponseEntity.ok(new TokenDTO(token, "Bearer"));
+            return ResponseEntity.ok(new TokenDto(token, "Bearer"));
         } catch (AuthenticationException e) {
             return ResponseEntity.badRequest().build();
         }

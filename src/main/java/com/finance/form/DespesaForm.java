@@ -1,6 +1,6 @@
 package com.finance.form;
 
-import com.finance.domain.Receita;
+import com.finance.domain.Despesa;
 import com.finance.domain.Usuario;
 
 import javax.validation.constraints.NotEmpty;
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class ReceitaForm {
+public class DespesaForm {
 
     @NotNull(message = "O campo valor é obrigatório")
     private Double valor;
@@ -17,22 +17,22 @@ public class ReceitaForm {
     @NotEmpty(message = "O campo data é obrigatório")
     private String data;
 
-    public Receita converter(Usuario usuario) {
+    public Despesa converter(Usuario usuario) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        Receita receita = new Receita();
-        receita.setValor(this.valor);
-        receita.setDescricao(this.descricao);
-        receita.setData(LocalDate.parse(this.data, formatter));
-        receita.setUsuario(usuario);
-        return receita;
+        Despesa despesa = new Despesa();
+        despesa.setValor(this.valor);
+        despesa.setDescricao(this.descricao);
+        despesa.setData(LocalDate.parse(this.data, formatter));
+        despesa.setUsuario(usuario);
+        return despesa;
     }
 
-    public Receita atualizarReceita(Receita receita) {
+    public Despesa atualizarDespesa(Despesa despesa) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        receita.setValor(this.valor);
-        receita.setDescricao(this.descricao);
-        receita.setData(LocalDate.parse(this.data, formatter));
-        return receita;
+        despesa.setValor(this.valor);
+        despesa.setDescricao(this.descricao);
+        despesa.setData(LocalDate.parse(this.data, formatter));
+        return despesa;
     }
 
     public Double getValor() {
@@ -58,6 +58,4 @@ public class ReceitaForm {
     public void setData(String data) {
         this.data = data;
     }
-
-
 }

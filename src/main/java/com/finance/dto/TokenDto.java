@@ -1,10 +1,10 @@
 package com.finance.dto;
 
-public class TokenDTO {
+public class TokenDto {
     private String token;
     private String tipoToken;
 
-    public TokenDTO(String token, String bearer) {
+    public TokenDto(String token, String bearer) {
         this.token = token;
         this.tipoToken = bearer;
     }

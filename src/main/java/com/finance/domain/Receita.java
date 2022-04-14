@@ -1,8 +1,6 @@
 package com.finance.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finance.repository.ReceitaRepository;
 
 import javax.persistence.*;
@@ -18,6 +16,7 @@ public class Receita {
     private Double valor;
     private String descricao;
     private LocalDate data;
+
     @ManyToOne
     @JoinColumn(name = "usuario_id")
     @JsonIgnore
