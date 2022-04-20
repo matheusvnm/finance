@@ -1,6 +1,7 @@
 package com.finance.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.finance.enums.CategoriaEnum;
 import com.finance.repository.DespesaRepository;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ public class Despesa {
     private Double valor;
     private String descricao;
     private LocalDate data;
+    private CategoriaEnum categoria;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id")
@@ -59,6 +61,14 @@ public class Despesa {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public CategoriaEnum getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(CategoriaEnum categoriaEnum) {
+        this.categoria = categoriaEnum;
     }
 
     @Override

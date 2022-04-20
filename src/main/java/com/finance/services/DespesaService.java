@@ -55,4 +55,10 @@ public class DespesaService {
                 .buildAndExpand(despesa.getId())
                 .toUri();
     }
+
+    public Page<Despesa> buscarTodasDespesasDoUsuarioComDescricao(Usuario usuario, Pageable pageble,
+                                                                  String descricao) {
+        return despesaRepository.findAllByUsuarioIdAndDescricaoContaining(pageble, usuario.getId(),
+                descricao);
+    }
 }

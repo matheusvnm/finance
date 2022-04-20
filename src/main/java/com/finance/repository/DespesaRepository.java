@@ -10,5 +10,9 @@ import java.time.LocalDate;
 public interface DespesaRepository extends JpaRepository<Despesa, Long> {
     Boolean existsDespesaByDataBetweenAndDescricaoEquals(LocalDate startDate, LocalDate endDate,
                                                          String descricao);
+
     Page<Despesa> findAllByUsuarioId(Pageable pageable, Long usuarioId);
+
+    Page<Despesa> findAllByUsuarioIdAndDescricaoContaining(Pageable pageable, Long usuarioId,
+                                                              String descricao);
 }

@@ -39,9 +39,13 @@ public class DespesaController {
     @GetMapping
     public Page<Despesa> listarTodasDespesas(
             @PageableDefault(sort = "descricao", direction = Sort.Direction.ASC) Pageable pageble,
-            HttpServletRequest request) {
+            HttpServletRequest request, @RequestParam(required = false) String descricao) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
-        return despesaService.buscarTodasDespesasDoUsuario(usuario, pageble);
+        if (descricao == null)
+            return despesaService.buscarTodasDespesasDoUsuario(usuario, pageble);
+
+        return despesaService.buscarTodasDespesasDoUsuarioComDescricao(usuario, pageble,
+                descricao);
     }
 
     @GetMapping("/{id}")
@@ -86,11 +90,14 @@ public class DespesaController {
             Optional<Despesa> despesasDoUsuarioOptional = despesaService.buscarDespesasDoUsuario(
                     usuario,
                     id);
-            return despesasDoUsuarioOptional.isPresent() ? ResponseEntity.ok(
-                    despesaForm.atualizarDespesa(
-                            despesasDoUsuarioOptional.get())) : ResponseEntity.notFound()
-                    .build();
 
+            if (despesasDoUsuarioOptional.isPresent()) {
+                Despesa despesaEditada = despesaForm.atualizarDespesa(
+                        despesasDoUsuarioOptional.get());
+                return ResponseEntity.ok(new DespesaDto(despesaEditada));
+            } else
+                return ResponseEntity.notFound()
+                        .build();
         }
         return ResponseEntity.badRequest()
                 .body("Já existe uma despesa com está descrição no mês de " + despesa.getData()
