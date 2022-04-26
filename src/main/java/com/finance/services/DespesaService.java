@@ -24,8 +24,8 @@ public class DespesaService {
         return !despesa.existeDespesaComMesmaDescricaoNoMes(despesaRepository);
     }
 
-    public Page<Despesa> buscarTodasDespesasDoUsuario(Usuario usuario, Pageable pageable) {
-        return despesaRepository.findAllByUsuarioId(pageable, usuario.getId());
+    public Page<Despesa> buscarTodasDespesasDoUsuario(Long usuarioId, Pageable pageable) {
+        return despesaRepository.findAllByUsuarioId(pageable, usuarioId);
     }
 
 
@@ -56,9 +56,14 @@ public class DespesaService {
                 .toUri();
     }
 
-    public Page<Despesa> buscarTodasDespesasDoUsuarioComDescricao(Usuario usuario, Pageable pageble,
+    public Page<Despesa> buscarTodasDespesasDoUsuarioComDescricao(Long usuarioId, Pageable pageble,
                                                                   String descricao) {
-        return despesaRepository.findAllByUsuarioIdAndDescricaoContaining(pageble, usuario.getId(),
+        return despesaRepository.findAllByUsuarioIdAndDescricaoContaining(pageble, usuarioId,
                 descricao);
+    }
+
+    public Page<Despesa> buscarTodasDespesasDoUsuarioPorData(Long usuarioId, Pageable pageble,
+                                                             Integer mes, Integer ano) {
+        return despesaRepository.findAllByUsuarioIdAndData_MesAndData_Ano(usuarioId, mes, ano, pageble);
     }
 }

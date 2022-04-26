@@ -22,8 +22,13 @@ public class UsuarioService {
 
     public Usuario recuperarUsuario(HttpServletRequest request) {
         String token = jwtService.getToken(request);
-        Long idUsuario = jwtService.getIdUsuario(token);
-        return usuarioRepository.getById(idUsuario);
+        Long usuarioId = jwtService.getIdUsuario(token);
+        return usuarioRepository.getById(usuarioId);
+    }
+
+    public Long recuperarUsuarioId(HttpServletRequest request) {
+        String token = jwtService.getToken(request);
+        return jwtService.getIdUsuario(token);
     }
 
     public URI saveAndBuildUri(Usuario usuario, UriComponentsBuilder uriComponentsBuilder, String urlPath) {

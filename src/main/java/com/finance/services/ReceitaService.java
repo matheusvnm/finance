@@ -32,8 +32,8 @@ public class ReceitaService {
     }
 
 
-    public Page<Receita> buscarTodasReceitasDoUsuario(Usuario usuario, Pageable pageable) {
-        return receitaRepository.findAllByUsuarioId(pageable, usuario.getId());
+    public Page<Receita> buscarTodasReceitasDoUsuario(Long usuarioId, Pageable pageable) {
+        return receitaRepository.findAllByUsuarioId(pageable, usuarioId);
     }
 
     public Optional<Receita> buscarUmaReceitaDoUsuario(Usuario usuario, Long id) {
@@ -53,5 +53,17 @@ public class ReceitaService {
         }
         return ResponseEntity.notFound()
                 .build();
+    }
+
+    public Page<Receita> buscarTodasReceitasDoUsuarioComDescricao(Long usuarioId, Pageable pageble,
+                                                                  String descricao) {
+        return receitaRepository.findAllByUsuarioIdAndDescricaoContaining(pageble, usuarioId,
+                descricao);
+    }
+
+    public Page<Receita> buscarTodasReceitasDoUsuarioPorData(Long usuarioId, Pageable pageble,
+                                                             Integer mes, Integer ano) {
+        return receitaRepository.findAllByUsuarioIdAndData_MesAndData_Ano(usuarioId, mes, ano,
+                pageble);
     }
 }

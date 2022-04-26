@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -40,12 +41,20 @@ public class DespesaController {
     public Page<Despesa> listarTodasDespesas(
             @PageableDefault(sort = "descricao", direction = Sort.Direction.ASC) Pageable pageble,
             HttpServletRequest request, @RequestParam(required = false) String descricao) {
-        Usuario usuario = usuarioService.recuperarUsuario(request);
+        Long usuarioId = usuarioService.recuperarUsuarioId(request);
         if (descricao == null)
-            return despesaService.buscarTodasDespesasDoUsuario(usuario, pageble);
+            return despesaService.buscarTodasDespesasDoUsuario(usuarioId, pageble);
 
-        return despesaService.buscarTodasDespesasDoUsuarioComDescricao(usuario, pageble,
+        return despesaService.buscarTodasDespesasDoUsuarioComDescricao(usuarioId, pageble,
                 descricao);
+    }
+
+    @GetMapping("/{ano}/{mes}")
+    public Page<Despesa> listarTodasDespesasPorMesAno(
+            @PageableDefault(sort = "descricao", direction = Sort.Direction.ASC) Pageable pageble,
+            HttpServletRequest request, @PathVariable Integer ano, @PathVariable Integer mes) {
+        Long usuarioId = usuarioService.recuperarUsuarioId(request);
+        return despesaService.buscarTodasDespesasDoUsuarioPorData(usuarioId, pageble, mes, ano);
     }
 
     @GetMapping("/{id}")

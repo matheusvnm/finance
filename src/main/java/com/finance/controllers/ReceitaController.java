@@ -36,9 +36,19 @@ public class ReceitaController {
     @GetMapping
     public Page<Receita> listarTodasReceitas(
             @PageableDefault(sort = "descricao", direction = Sort.Direction.ASC) Pageable pageble,
-            HttpServletRequest request) {
-        Usuario usuario = usuarioService.recuperarUsuario(request);
-        return receitaService.buscarTodasReceitasDoUsuario(usuario, pageble);
+            HttpServletRequest request, @RequestParam(required = false) String descricao) {
+        Long usuarioId = usuarioService.recuperarUsuarioId(request);
+        if (descricao == null)
+            return receitaService.buscarTodasReceitasDoUsuario(usuarioId, pageble);
+        return receitaService.buscarTodasReceitasDoUsuarioComDescricao(usuarioId, pageble, descricao);
+    }
+
+    @GetMapping("/{ano}/{mes}")
+    public Page<Receita> listarTodasDespesasPorMesAno(
+            @PageableDefault(sort = "descricao", direction = Sort.Direction.ASC) Pageable pageble,
+            HttpServletRequest request, @PathVariable Integer ano, @PathVariable Integer mes) {
+        Long usuarioId = usuarioService.recuperarUsuarioId(request);
+        return receitaService.buscarTodasReceitasDoUsuarioPorData(usuarioId, pageble, mes, ano);
     }
 
     @GetMapping("/{id}")

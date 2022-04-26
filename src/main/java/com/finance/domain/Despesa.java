@@ -16,6 +16,7 @@ public class Despesa {
     private Double valor;
     private String descricao;
     private LocalDate data;
+    @Enumerated(EnumType.STRING)
     private CategoriaEnum categoria;
 
     @ManyToOne
