@@ -2,7 +2,6 @@ package com.finance.domain;
 
 
 import com.finance.enums.CategoriaEnum;
-import net.bytebuddy.dynamic.scaffold.MethodRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,20 +29,15 @@ public class Resumo {
         saldoFinal = valorReceitas - valorDespesas;
     }
 
-    public void calcularDespesaPorCategoria(List<Despesa> despesas) {
-        for (CategoriaEnum categoriaEnum : CategoriaEnum.values()) {
+    public void calcularDespesasPorCategoria(List<Despesa> despesas) {
+        for (CategoriaEnum categoriaEnum : CategoriaEnum.values())
             despesaPorCategorias.add(new DespesaPorCategoria(categoriaEnum.toString(), 0.0));
-        }
 
-        for (Despesa despesa : despesas) {
-            for (DespesaPorCategoria despesaCategoria : despesaPorCategorias) {
+        for (Despesa despesa : despesas)
+            for (DespesaPorCategoria despesaCategoria : despesaPorCategorias)
                 if (despesaCategoria.getDespesaNome()
                         .equals(despesa.getCategoria()
-                                .toString())) {
-                    despesaCategoria.addUmaDespesa(despesa.getValor());
-                }
-            }
-        }
+                                .toString())) despesaCategoria.addUmaDespesa(despesa.getValor());
     }
 
     public double getValorDespesas() {

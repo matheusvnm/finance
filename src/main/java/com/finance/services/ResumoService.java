@@ -27,7 +27,7 @@ public class ResumoService {
         resumo.calcularDespesas(despesas);
         resumo.calcularReceitas(receitas);
         resumo.calcularSaldoFinal();
-        resumo.calcularDespesaPorCategoria(despesas);
+        resumo.calcularDespesasPorCategoria(despesas);
         return resumo;
     }
 }
