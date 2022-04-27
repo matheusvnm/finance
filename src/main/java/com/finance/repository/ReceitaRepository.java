@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface ReceitaRepository extends JpaRepository<Receita, Long> {
     Boolean existsReceitaByDataBetweenAndDescricaoEquals(LocalDate startDate, LocalDate endDate,
@@ -23,4 +24,9 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long> {
     Page<Receita> findAllByUsuarioIdAndData_MesAndData_Ano(@Param("usuario_id") Long usuarioId,
                                                            @Param("mes") Integer mes,
                                                            @Param("ano") Integer ano, Pageable pageable);
+    @Query("SELECT r FROM Receita r " +
+            "WHERE r.usuario.id = :usuario_id AND MONTH(r.data) = :mes AND YEAR(r.data) = :ano")
+    List<Receita> findAllByUsuarioIdAndData_MesAndData_Ano(@Param("usuario_id") Long usuarioId,
+                                                           @Param("mes") Integer mes,
+                                                           @Param("ano") Integer ano);
 }

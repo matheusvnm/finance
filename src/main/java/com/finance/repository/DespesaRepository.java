@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface DespesaRepository extends JpaRepository<Despesa, Long> {
     Boolean existsDespesaByDataBetweenAndDescricaoEquals(LocalDate startDate, LocalDate endDate,
@@ -25,4 +26,9 @@ public interface DespesaRepository extends JpaRepository<Despesa, Long> {
                                                            @Param("ano") Integer ano,
                                                            Pageable pageable);
 
+    @Query("SELECT d FROM Despesa d " +
+            "WHERE d.usuario.id = :usuario_id AND MONTH(d.data) = :mes AND YEAR(d.data) = :ano")
+    List<Despesa> findAllByUsuarioIdAndData_MesAndData_Ano(@Param("usuario_id") Long usuarioId,
+                                                           @Param("mes") Integer mes,
+                                                           @Param("ano") Integer ano);
 }
