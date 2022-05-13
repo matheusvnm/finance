@@ -13,6 +13,7 @@ import java.util.List;
 public interface DespesaRepository extends JpaRepository<Despesa, Long> {
     Boolean existsDespesaByDataBetweenAndDescricaoEquals(LocalDate startDate, LocalDate endDate,
                                                          String descricao);
+    void deleteAllByUsuarioId(Long usuario_id);
 
     Page<Despesa> findAllByUsuarioId(Pageable pageable, Long usuarioId);
 

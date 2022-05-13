@@ -2,8 +2,10 @@ package com.finance.controllers;
 
 import com.finance.config.security.JwtService;
 import com.finance.dto.TokenDto;
+import com.finance.exception.UserNotFoundException;
 import com.finance.form.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +20,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
+@Profile(value = {"prod", "test"})
 public class AuthenticationController {
 
     @Autowired
@@ -26,14 +29,16 @@ public class AuthenticationController {
     JwtService jwtService;
 
     @PostMapping
-    public ResponseEntity<TokenDto> authenticate(@RequestBody @Valid LoginForm loginForm) {
+    public ResponseEntity<?> authenticate(@RequestBody @Valid LoginForm loginForm) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = loginForm.converter();
         try {
-            Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            Authentication authentication = authenticationManager.authenticate(
+                    usernamePasswordAuthenticationToken);
             String token = jwtService.gerarToken(authentication);
             return ResponseEntity.ok(new TokenDto(token, "Bearer"));
         } catch (AuthenticationException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest()
+                    .body("Usuário com esse e-mail e senha não encontrado!");
         }
 
     }
