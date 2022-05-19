@@ -1,15 +1,12 @@
 package com.finance.controllers;
 
 import com.finance.domain.Despesa;
-import com.finance.domain.Receita;
 import com.finance.domain.Usuario;
 import com.finance.dto.DespesaDto;
-import com.finance.dto.ReceitaDto;
 import com.finance.form.DespesaForm;
 import com.finance.services.DespesaService;
 import com.finance.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,7 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.time.format.TextStyle;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -45,7 +41,6 @@ public class DespesaController {
         Long usuarioId = usuarioService.recuperarUsuarioId(request);
         if (descricao == null)
             return despesaService.buscarTodasDespesasDoUsuario(usuarioId, pageble);
-
         return despesaService.buscarTodasDespesasDoUsuarioComDescricao(usuarioId, pageble,
                 descricao);
     }
@@ -90,30 +85,21 @@ public class DespesaController {
     }
 
     @Transactional
-    @PutMapping("/{id}")
+    @PutMapping("/{id}") //FIXME Não deve permitir que atualize para uma descrição já existente.
     public ResponseEntity<?> atualizaDespesa(@PathVariable Long id,
                                              @RequestBody @Valid DespesaForm despesaForm,
                                              HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
-        Despesa despesa = despesaForm.converter(usuario);
-        if (despesaService.isDescricaoAndDataValida(despesa)) {
-            Optional<Despesa> despesasDoUsuarioOptional = despesaService.buscarDespesasDoUsuario(
-                    usuario,
-                    id);
-
-            if (despesasDoUsuarioOptional.isPresent()) {
-                Despesa despesaEditada = despesaForm.atualizarDespesa(
-                        despesasDoUsuarioOptional.get());
-                return ResponseEntity.ok(new DespesaDto(despesaEditada));
-            } else
-                return ResponseEntity.notFound()
-                        .build();
-        }
-        return ResponseEntity.badRequest()
-                .body("Já existe uma despesa com está descrição no mês de " + despesa.getData()
-                        .getMonth()
-                        .getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
-
+        Optional<Despesa> despesasDoUsuarioOptional = despesaService.buscarDespesasDoUsuario(
+                usuario,
+                id);
+        if (despesasDoUsuarioOptional.isPresent()) {
+            Despesa despesaEditada = despesaForm.atualizarDespesa(
+                    despesasDoUsuarioOptional.get());
+            return ResponseEntity.ok(new DespesaDto(despesaEditada));
+        } else
+            return ResponseEntity.notFound()
+                    .build();
     }
 
     @DeleteMapping("/{id}")

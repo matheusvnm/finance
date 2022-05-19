@@ -87,17 +87,10 @@ public class ReceitaController {
                                              @RequestBody @Valid ReceitaForm receitaForm,
                                              HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
-        Receita receita = receitaForm.converter(usuario);
-        if (receitaService.isDescricaoAndDataValida(receita)) {
-            Optional<Receita> receitaOptional = receitaService.buscarUmaReceitaDoUsuario(usuario, id);
-            return receitaOptional.isPresent() ? ResponseEntity.ok(
-                    receitaForm.atualizarReceita(receitaOptional.get())) : ResponseEntity.notFound()
-                    .build();
-        }
-        return ResponseEntity.badRequest()
-                .body("Já existe uma receita com está descrição no mês de " + receita.getData()
-                        .getMonth()
-                        .getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
+        Optional<Receita> receitaOptional = receitaService.buscarUmaReceitaDoUsuario(usuario, id);
+        return receitaOptional.isPresent() ? ResponseEntity.ok(
+                receitaForm.atualizarReceita(receitaOptional.get())) : ResponseEntity.notFound()
+                .build();
     }
 
     @DeleteMapping("/{id}")
