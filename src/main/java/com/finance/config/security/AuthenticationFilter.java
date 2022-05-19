@@ -16,8 +16,8 @@ import java.util.Optional;
 
 public class AuthenticationFilter extends OncePerRequestFilter {
 
-    private JwtService jwtService;
-    private UsuarioRepository usuarioRepository;
+    private final JwtService jwtService;
+    private final UsuarioRepository usuarioRepository;
 
 
     public AuthenticationFilter(JwtService jwtService, UsuarioRepository usuarioRepository) {

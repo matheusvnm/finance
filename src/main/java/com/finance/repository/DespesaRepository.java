@@ -9,10 +9,16 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface DespesaRepository extends JpaRepository<Despesa, Long> {
     Boolean existsDespesaByDataBetweenAndDescricaoEquals(LocalDate startDate, LocalDate endDate,
                                                          String descricao);
+
+    Boolean existsDespesaByDataBetweenAndDescricaoEqualsAndIdIsNot(LocalDate startDate, LocalDate endDate,
+                                                    String descricao, Long userId);
+
+    Optional<Despesa> findFirstByIdAndUsuarioId(Long despesaId, Long usuarioId);
 
     Despesa findFirstByDescricaoAndData(String descricao, LocalDate data);
 

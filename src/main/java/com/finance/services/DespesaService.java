@@ -24,12 +24,16 @@ public class DespesaService {
         return !despesa.existeDespesaComMesmaDescricaoNoMes(despesaRepository);
     }
 
+    public boolean existeDespesaComDescricaoIgualMasIdDiferentes(Despesa despesa, Long id) {
+        return despesa.existeDespesaComDescricaoIgualMasIdDiferentes(despesaRepository, id);
+    }
+
     public Page<Despesa> buscarTodasDespesasDoUsuario(Long usuarioId, Pageable pageable) {
         return despesaRepository.findAllByUsuarioId(pageable, usuarioId);
     }
 
 
-    public Optional<Despesa> buscarDespesasDoUsuario(Usuario usuario, Long id) {
+    public Optional<Despesa> buscarUmaDespesasDoUsuario(Usuario usuario, Long id) {
         return usuario.getDespesas()
                 .stream()
                 .filter(despesa -> despesa.getId()
@@ -37,6 +41,11 @@ public class DespesaService {
                 .findFirst();
     }
 
+    public Optional<Despesa> buscarUmaDespesaDoUsuario(Long usuarioId, Long id) {
+        return despesaRepository.findFirstByIdAndUsuarioId(id, usuarioId);
+    }
+
+    //FIXME Serviços não devem lidar com a entidade de respostas
     public ResponseEntity<?> deleteDespesa(Long id) {
         Optional<Despesa> despesaOptinal = despesaRepository.findById(id);
         if (despesaOptinal.isPresent()) {

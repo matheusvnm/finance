@@ -240,6 +240,7 @@ class DespesaControllerTest {
                 .andExpect(MockMvcResultMatchers.status()
                         .is(
                                 HttpStatus.OK.value()));
+        Assert.isTrue(despesaRepository.findById(despesaId).isEmpty());
     }
 
     @AfterEach

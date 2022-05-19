@@ -1,7 +1,5 @@
 package com.finance.enums;
 
-import java.util.Arrays;
-
 public enum CategoriaEnum {
     ALIMENTACAO("Alimentação"),
     SAUDE("Saúde"),

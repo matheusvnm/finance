@@ -1,12 +1,6 @@
 package com.finance.dto;
 
 import com.finance.domain.Receita;
-import com.finance.domain.Usuario;
-import org.springframework.http.ResponseEntity;
-
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import java.time.LocalDate;
 
 public class ReceitaDto {
 

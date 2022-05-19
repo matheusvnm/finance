@@ -107,4 +107,11 @@ public class Receita {
         return receitaRepository.existsReceitaByDataBetweenAndDescricaoEquals(this.getDataInicialDoMes(),
                 this.getDataFinalDoMes(), this.descricao);
     }
+
+    public boolean existeReceitaComDescricaoIgualMasIdDiferentes(
+            ReceitaRepository receitaRepository, Long id) {
+        return receitaRepository.existsReceitaByDataBetweenAndDescricaoEqualsAndIdIsNot(
+                this.getDataInicialDoMes(),
+                this.getDataFinalDoMes(), this.getDescricao(), id);
+    }
 }

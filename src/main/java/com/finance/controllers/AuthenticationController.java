@@ -2,7 +2,6 @@ package com.finance.controllers;
 
 import com.finance.config.security.JwtService;
 import com.finance.dto.TokenDto;
-import com.finance.exception.UserNotFoundException;
 import com.finance.form.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;

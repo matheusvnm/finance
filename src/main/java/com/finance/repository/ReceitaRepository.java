@@ -9,10 +9,16 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReceitaRepository extends JpaRepository<Receita, Long> {
     Boolean existsReceitaByDataBetweenAndDescricaoEquals(LocalDate startDate, LocalDate endDate,
                                                          String descricao);
+
+    Optional<Receita> findFirstByIdAndUsuarioId(Long id, Long usuarioId);
+
+    Boolean existsReceitaByDataBetweenAndDescricaoEqualsAndIdIsNot(LocalDate startDate, LocalDate endDate,
+                                                                   String descricao, Long userId);
 
     Page<Receita> findAllByUsuarioId(Pageable pageable, Long usuarioId);
 
@@ -29,4 +35,5 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long> {
     List<Receita> findAllByUsuarioIdAndData_MesAndData_Ano(@Param("usuario_id") Long usuarioId,
                                                            @Param("mes") Integer mes,
                                                            @Param("ano") Integer ano);
+
 }

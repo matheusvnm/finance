@@ -3,8 +3,8 @@ package com.finance.dto;
 import com.finance.domain.Usuario;
 
 public class UsuarioDto {
-    private String nome;
-    private String email;
+    private final String nome;
+    private final String email;
 
     public UsuarioDto(Usuario usuario) {
         this.nome = usuario.getNome();

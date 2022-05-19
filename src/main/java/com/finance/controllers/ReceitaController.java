@@ -7,7 +7,6 @@ import com.finance.form.ReceitaForm;
 import com.finance.services.ReceitaService;
 import com.finance.services.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -41,7 +40,8 @@ public class ReceitaController {
         Long usuarioId = usuarioService.recuperarUsuarioId(request);
         if (descricao == null)
             return receitaService.buscarTodasReceitasDoUsuario(usuarioId, pageble);
-        return receitaService.buscarTodasReceitasDoUsuarioComDescricao(usuarioId, pageble, descricao);
+        return receitaService.buscarTodasReceitasDoUsuarioComDescricao(usuarioId, pageble,
+                descricao);
     }
 
     @GetMapping("/{ano}/{mes}")
@@ -82,15 +82,32 @@ public class ReceitaController {
     }
 
     @Transactional
-    @PutMapping("/{id}")
+    @PutMapping("/{id}")  //FIXME Não deve permitir que atualize para uma descrição já existente.
     public ResponseEntity<?> atualizaReceita(@PathVariable Long id,
                                              @RequestBody @Valid ReceitaForm receitaForm,
                                              HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
-        Optional<Receita> receitaOptional = receitaService.buscarUmaReceitaDoUsuario(usuario, id);
-        return receitaOptional.isPresent() ? ResponseEntity.ok(
-                receitaForm.atualizarReceita(receitaOptional.get())) : ResponseEntity.notFound()
-                .build();
+        Receita receita = receitaForm.converter(usuario);
+        Optional<Receita> receitaAntiga = receitaService.buscarUmaReceitaDoUsuario(
+                usuario.getId(), id);
+        if (receitaAntiga.isEmpty()) {
+            return ResponseEntity.notFound()
+                    .build();
+        }
+
+        if (receitaService.existeReceitaComDescricaoIgualMasIdDiferentes(receita, id)) {
+            return ResponseEntity.badRequest()
+                    .body("Não foi possível atualizar a receita pois"
+                            + " já existe uma despesa com está descrição no mês de "
+                            + receitaAntiga.get()
+                            .getData()
+                            .getMonth()
+                            .getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
+        }
+
+        return ResponseEntity.ok(
+                new ReceitaDto(receitaForm.atualizarReceita(receitaAntiga.get())));
+
     }
 
     @DeleteMapping("/{id}")

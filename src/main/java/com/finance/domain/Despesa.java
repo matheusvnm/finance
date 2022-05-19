@@ -118,4 +118,11 @@ public class Despesa {
                 this.getDataInicialDoMes(),
                 this.getDataFinalDoMes(), this.descricao);
     }
+
+    public boolean existeDespesaComDescricaoIgualMasIdDiferentes(
+            DespesaRepository despesaRepository, Long id) {
+         return despesaRepository.existsDespesaByDataBetweenAndDescricaoEqualsAndIdIsNot(
+                this.getDataInicialDoMes(),
+                this.getDataFinalDoMes(), this.getDescricao(), id);
+    }
 }

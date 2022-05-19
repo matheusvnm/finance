@@ -1,0 +1,33 @@
+version: "3"
+services:
+  mysql-db:
+    image: "mysql:8.0.29"
+    platform: linux/x86_64
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "root"
+      MYSQL_DATABASE: "finance"
+    ports:
+      - "3306:3306"
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - backend
+
+
+  spring-finance:
+    image: spring-finance
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql-db:3306/finance?createDatabaseIfNotExists=true&autoReconnect=true"
+      SPRING_DATASOURCE_USERNAME: "root"
+      SPRING_DATASOURCE_PASSWORD: "root"
+    ports:
+      - "8080:8080"
+    build:
+      context: "./"
+      dockerfile: "Dockerfile"
+    depends_on:
+      - mysql-db
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - backend
+networks:
+  backend:

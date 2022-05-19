@@ -44,6 +44,11 @@ public class ReceitaService {
                 .findFirst();
     }
 
+    public Optional<Receita> buscarUmaReceitaDoUsuario(Long usuarioId, Long id) {
+        return receitaRepository.findFirstByIdAndUsuarioId(id, usuarioId);
+    }
+
+    //FIXME Serviços não devem lidar com a entidade de respostas
     public ResponseEntity<?> deleteReceita(Long id) {
         Optional<Receita> receitaOptional = receitaRepository.findById(id);
         if (receitaOptional.isPresent()) {
@@ -65,5 +70,9 @@ public class ReceitaService {
                                                              Integer mes, Integer ano) {
         return receitaRepository.findAllByUsuarioIdAndData_MesAndData_Ano(usuarioId, mes, ano,
                 pageble);
+    }
+
+    public boolean existeReceitaComDescricaoIgualMasIdDiferentes(Receita receita, Long id) {
+        return receita.existeReceitaComDescricaoIgualMasIdDiferentes(receitaRepository, id);
     }
 }

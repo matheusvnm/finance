@@ -56,12 +56,11 @@ public class DespesaController {
     @GetMapping("/{id}")
     public ResponseEntity<?> detalharDespesa(@PathVariable Long id, HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
-        Optional<Despesa> despesaOptional = despesaService.buscarDespesasDoUsuario(usuario, id);
+        Optional<Despesa> despesaOptional = despesaService.buscarUmaDespesasDoUsuario(usuario, id);
         return despesaOptional.isPresent() ? ResponseEntity.ok(
                 despesaOptional.get()) : ResponseEntity.notFound()
                 .build();
     }
-
 
     @Transactional
     @PostMapping
@@ -70,36 +69,46 @@ public class DespesaController {
                                           HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
         Despesa despesa = despesaForm.converter(usuario);
-        if (despesaService.isDescricaoAndDataValida(despesa)) {
-            URI uri = despesaService.saveAndBuildUri(despesa, uriComponentsBuilder,
-                    "/despesas/{id}");
-            return ResponseEntity.created(uri)
-                    .body(new DespesaDto(despesa));
+        if (!despesaService.isDescricaoAndDataValida(despesa)) {
+            return ResponseEntity.badRequest()
+                    .body("Já existe uma despesa com está descrição no mês de " + despesa.getData()
+                            .getMonth()
+                            .getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
         }
-
-        return ResponseEntity.badRequest()
-                .body("Já existe uma despesa com está descrição no mês de " + despesa.getData()
-                        .getMonth()
-                        .getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
+        URI uri = despesaService.saveAndBuildUri(despesa, uriComponentsBuilder, "/despesas/{id}");
+        return ResponseEntity.created(uri)
+                .body(new DespesaDto(despesa));
 
     }
 
     @Transactional
-    @PutMapping("/{id}") //FIXME Não deve permitir que atualize para uma descrição já existente.
+    @PutMapping("/{id}")
     public ResponseEntity<?> atualizaDespesa(@PathVariable Long id,
                                              @RequestBody @Valid DespesaForm despesaForm,
                                              HttpServletRequest request) {
         Usuario usuario = usuarioService.recuperarUsuario(request);
-        Optional<Despesa> despesasDoUsuarioOptional = despesaService.buscarDespesasDoUsuario(
-                usuario,
-                id);
-        if (despesasDoUsuarioOptional.isPresent()) {
-            Despesa despesaEditada = despesaForm.atualizarDespesa(
-                    despesasDoUsuarioOptional.get());
-            return ResponseEntity.ok(new DespesaDto(despesaEditada));
-        } else
+        Despesa despesa = despesaForm.converter(usuario);
+        Optional<Despesa> despesaAntiga = despesaService.buscarUmaDespesaDoUsuario(
+                usuario.getId(), id);
+
+        if (despesaAntiga.isEmpty()) {
             return ResponseEntity.notFound()
                     .build();
+        }
+
+        if (despesaService.existeDespesaComDescricaoIgualMasIdDiferentes(despesa, id)) {
+            return ResponseEntity.badRequest()
+                    .body("Não foi possível atualizar a despesa pois"
+                            + " já existe uma despesa com está descrição no mês de "
+                            + despesaAntiga.get()
+                            .getData()
+                            .getMonth()
+                            .getDisplayName(TextStyle.FULL, new Locale("pt", "BR")));
+        }
+
+        return ResponseEntity.ok(
+                new DespesaDto(despesaForm.atualizarDespesa(despesaAntiga.get())));
+
     }
 
     @DeleteMapping("/{id}")

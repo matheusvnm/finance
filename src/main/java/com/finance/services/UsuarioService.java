@@ -1,11 +1,9 @@
 package com.finance.services;
 
 import com.finance.config.security.JwtService;
-import com.finance.domain.Receita;
 import com.finance.domain.Usuario;
 import com.finance.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
